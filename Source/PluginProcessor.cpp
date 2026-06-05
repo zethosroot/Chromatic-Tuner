@@ -95,6 +95,12 @@ void TunerPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    m_ringBuffer.fill(0.0f); // Hold a sample to work with
+    m_ringWritePos = 0; // Indexing
+    m_sampleRate = sampleRate; // Set the sample rate.
+    m_bufferFull = false; // Buffer is empty
+
 }
 
 void TunerPluginAudioProcessor::releaseResources()
@@ -129,6 +135,46 @@ bool TunerPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
+
+static float detectPitch(const float* buf, int bufSize, double sampleRate) {
+    
+    int half = bufSize / 2;
+
+    std::vector<float> d(half, 0.0f); // Difference
+    std::vector<float> d_norm(half, 0.0f); // Normalization
+
+    for (int tau = 1; tau < half; ++tau)
+    {
+        for (int i = 0; i < half; ++i)
+        {
+            float diff = buf[i] - buf[i + tau];
+            d[tau] += diff * diff;
+        }
+    }
+
+    d_norm[0] = 1.0f;
+
+    float runningSum = 0.0f;
+
+    for (int tau = 1; tau < half; ++tau) {
+        runningSum += d[tau];
+        d_norm[tau] = (runningSum > 0.0f) ? d[tau] * tau / runningSum : 1.0f; // Avoid division by 0
+    }
+
+    constexpr float THRESHOLD = 0.12f;
+
+    for (int tau = 2; tau < half; ++tau)
+    {
+        if (d_norm[tau] < THRESHOLD)
+        {
+            while (tau + 1 < half && d_norm[tau + 1] < d_norm[tau]) ++tau;
+
+            return (float)(sampleRate / tau);
+        }
+    }
+    return -1.0f;
+}
+
 void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -144,18 +190,31 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+    auto* data = buffer.getReadPointer(0);
+    int numSamples = buffer.getNumSamples();
 
-        // ..do something to the data...
+    for (int i = 0; i < numSamples; i++) {
+        m_ringBuffer[m_ringWritePos] = data[i];
+        m_ringWritePos = (m_ringWritePos + 1) % YIN_BUFFER_SIZE;
+
+        if (m_ringWritePos == 0) m_bufferFull = true;
     }
+
+    if (m_bufferFull) {
+
+        double frequency = -1.0; // Placeholder
+
+        if (frequency >= 50 && frequency <= 1400)
+            m_detectedHz.store(frequency, std::memory_order_relaxed);
+        else {
+            m_detectedHz.store(-1.0f, std::memory_order_relaxed);
+        }
+
+        m_bufferFull = false;    
+
+    }
+
+    
 }
 
 //==============================================================================

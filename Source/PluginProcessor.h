@@ -10,6 +10,8 @@
 
 #include <JuceHeader.h>
 
+static constexpr int YIN_BUFFER_SIZE = 2048;
+
 //==============================================================================
 /**
 */
@@ -53,7 +55,17 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //==============================================================================
+    std::atomic<float> m_detectedHz{-1.0f};
+    std::atomic<float> m_detectedCents{0.0f};
+    std::atomic<int> m_detectedNote{-1};
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TunerPluginAudioProcessor)
+
+    std::array<float, YIN_BUFFER_SIZE> m_ringBuffer{}; // Hold a sample to work with
+    int m_ringWritePos = 0; // Indexing
+    double m_sampleRate = 44100.0; // Set the sample rate.
+    bool m_bufferFull = false;
 };
