@@ -202,7 +202,7 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     if (m_bufferFull) {
 
-        double frequency = -1.0; // Placeholder
+        float frequency = detectPitch(m_ringBuffer.data(), YIN_BUFFER_SIZE, (float)getSampleRate());
 
         if (frequency >= 50 && frequency <= 1400)
             m_detectedHz.store(frequency, std::memory_order_relaxed);
@@ -211,7 +211,6 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         }
 
         m_bufferFull = false;    
-
     }
 
     
