@@ -101,6 +101,8 @@ void TunerPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     m_sampleRate = sampleRate; // Set the sample rate.
     m_bufferFull = false; // Buffer is empty
 
+    dywapitch_inittracking(&m_pitchTracker);
+
 }
 
 void TunerPluginAudioProcessor::releaseResources()
@@ -135,46 +137,6 @@ bool TunerPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
-
-static float detectPitch(const float* buf, int bufSize, double sampleRate) {
-    
-    int half = bufSize / 2;
-
-    std::vector<float> d(half, 0.0f); // Difference
-    std::vector<float> d_norm(half, 0.0f); // Normalization
-
-    for (int tau = 1; tau < half; ++tau)
-    {
-        for (int i = 0; i < half; ++i)
-        {
-            float diff = buf[i] - buf[i + tau];
-            d[tau] += diff * diff;
-        }
-    }
-
-    d_norm[0] = 1.0f;
-
-    float runningSum = 0.0f;
-
-    for (int tau = 1; tau < half; ++tau) {
-        runningSum += d[tau];
-        d_norm[tau] = (runningSum > 0.0f) ? d[tau] * tau / runningSum : 1.0f; // Avoid division by 0
-    }
-
-    constexpr float THRESHOLD = 0.12f;
-
-    for (int tau = 2; tau < half; ++tau)
-    {
-        if (d_norm[tau] < THRESHOLD)
-        {
-            while (tau + 1 < half && d_norm[tau + 1] < d_norm[tau]) ++tau;
-
-            return (float)(sampleRate / tau);
-        }
-    }
-    return -1.0f;
-}
-
 void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -202,15 +164,18 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     if (m_bufferFull) {
 
-        float frequency = detectPitch(m_ringBuffer.data(), YIN_BUFFER_SIZE, (float)getSampleRate());
+		double frequency = dywapitch_computepitch(&m_pitchTracker, m_ringBuffer.data(), 0, YIN_BUFFER_SIZE);
 
-        if (frequency >= 50 && frequency <= 1400)
+        if (frequency >= 50 && frequency <= 1400) {
             m_detectedHz.store(frequency, std::memory_order_relaxed);
+        }
         else {
             m_detectedHz.store(-1.0f, std::memory_order_relaxed);
-        }
+		}
 
-        m_bufferFull = false;    
+		m_bufferFull = false;
+
+
     }
 
     

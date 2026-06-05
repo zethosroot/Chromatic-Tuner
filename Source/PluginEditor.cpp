@@ -32,10 +32,13 @@ TunerPluginAudioProcessorEditor::~TunerPluginAudioProcessorEditor()
 //==============================================================================
 void TunerPluginAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::darkgrey);
+    g.fillAll (juce::Colour(0xFF1A1A1A));
+
+	g.setColour(juce::Colours::white);
+
     g.setFont(24.0f);
 
-    float currentHz = audioProcessor.m_detectedHz.load(std::memory_order_relaxed);
+    auto currentHz = audioProcessor.m_detectedHz.load(std::memory_order_relaxed);
 
     juce::String displayString;
 
@@ -43,7 +46,7 @@ void TunerPluginAudioProcessorEditor::paint (juce::Graphics& g)
         displayString = juce::String (currentHz, 1) + " Hz";
     }
     else {
-        displayString = "No Signal...";
+        displayString = "Idle";
     }
 
     g.drawText(displayString, getLocalBounds(), juce::Justification::centred, true);

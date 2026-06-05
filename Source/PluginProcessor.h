@@ -60,8 +60,8 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    std::atomic<float> m_detectedHz{-1.0f};
-    std::atomic<float> m_detectedCents{0.0f};
+    std::atomic<double> m_detectedHz{-1.0f};
+    std::atomic<double> m_detectedCents{0.0f};
     std::atomic<int> m_detectedNote{-1};
 
 private:
@@ -70,8 +70,8 @@ private:
 
     dywapitchtracker m_pitchTracker;
 
-    std::array<float, YIN_BUFFER_SIZE> m_ringBuffer{}; // Hold a sample to work with
+    std::array<double, YIN_BUFFER_SIZE> m_ringBuffer{}; // Hold a sample to work with
     int m_ringWritePos = 0; // Indexing
-    double m_sampleRate = 44100.0; // Set the sample rate.
+    double m_sampleRate = 44100.0; // Set the sample rate temporarily. It will be set properly by DAW.
     bool m_bufferFull = false;
 };
