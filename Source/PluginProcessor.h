@@ -12,6 +12,10 @@
 
 static constexpr int YIN_BUFFER_SIZE = 2048;
 
+extern "C" {
+    #include "dywapitchtrack.h"
+}
+
 //==============================================================================
 /**
 */
@@ -63,6 +67,8 @@ public:
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TunerPluginAudioProcessor)
+
+    dywapitchtracker m_pitchTracker;
 
     std::array<float, YIN_BUFFER_SIZE> m_ringBuffer{}; // Hold a sample to work with
     int m_ringWritePos = 0; // Indexing

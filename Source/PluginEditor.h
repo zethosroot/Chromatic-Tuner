@@ -14,7 +14,7 @@
 //==============================================================================
 /**
 */
-class TunerPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
+class TunerPluginAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
     TunerPluginAudioProcessorEditor (TunerPluginAudioProcessor&);
@@ -23,6 +23,7 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+	void timerCallback() override;
 
 private:
     // This reference is provided as a quick way for your editor to
