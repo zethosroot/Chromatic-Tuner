@@ -2,36 +2,20 @@
 #define _CONFIG_H
 
 constexpr int TUNER_TYPE_GROUP = 1;
+constexpr float RMS_THRESHOLD = 0.002f;
+constexpr float GUITAR_FREQ_MIN = 60.0f;
+constexpr float GUITAR_FREQ_MAX = 1400.0f;
+constexpr float BASS_FREQ_MIN = 25.0f;
+constexpr float BASS_FREQ_MAX = 400.0f;
+constexpr float CHROM_FREQ_MIN = 20.0f;
+constexpr float CHROM_FREQ_MAX = 4200.0f;
 
-const char* noteNamesSharp[12] = {
-	"C",
-	"C#",
-	"D",
-	"D#",
-	"E",
-	"F",
-	"F#",
-	"G",
-	"G#",
-	"A",
-	"A#",
-	"B"
-};
+extern const char* noteNamesSharp[12];
+extern const char* noteNamesFlat[12];
+extern double tuningReference;
 
-const char* noteNamesFlat[12] = {
-	u8"C",  
-	u8"D♭", 
-	u8"D",  
-	u8"E♭", 
-	u8"E",  
-	u8"F",
-	u8"G♭", 
-	u8"G",  
-	u8"A♭", 
-	u8"A",  
-	u8"B♭", 
-	u8"B"
-};
+constexpr char* SHARP_SYMBOL = u8"♯";
+constexpr char* FLAT_SYMBOL = u8"♭";
 
 struct LanguageStrings
 {
@@ -40,46 +24,24 @@ struct LanguageStrings
     const char* guitar;
     const char* bass;
     const char* chromatic;
-    const char* sharp;
-    const char* flat;
     const char* cents;
 };
 
 constexpr LanguageStrings LANG_EN = {
-    "Frequency",
-    "Deviation",
-    "Guitar",
-    "Bass",
-    "Chromatic",
-    "Sharp (#)",
-    "Flat (b)",
-    "cents"
+    "Frequency", "Deviation", "Guitar", "Bass",
+    "Chromatic", "cents"
 };
 
 constexpr LanguageStrings LANG_DE = {
-    u8"Frequenz",
-    u8"Abweichung",
-    u8"Gitarre",
-    u8"Bass",
-    u8"Chromatisch",
-    u8"Kreuz (#)",
-    u8"B (b)",
-    u8"cents"
+    u8"Frequenz", u8"Abweichung", u8"Gitarre", u8"Bass",
+    u8"Chromatisch", u8"cents"
 };
 
 constexpr LanguageStrings LANG_HU = {
-    u8"Frekvencia",
-    u8"Eltérés",
-    u8"Gitár",
-    u8"Basszus",
-    u8"Kromatikus",
-    u8"Kereszt (#)",
-    u8"Bé (b)",
-    u8"cent"
+    u8"Frekvencia", u8"Eltérés", u8"Gitár", u8"Basszus",
+    u8"Kromatikus", u8"cent"
 };
 
 constexpr LanguageStrings LANGUAGES[3] = { LANG_EN, LANG_DE, LANG_HU };
-
-double tuningReference = 440.0; // The international standard tuning frequency for A4
 
 #endif

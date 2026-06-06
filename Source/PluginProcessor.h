@@ -66,6 +66,7 @@ public:
 
     std::atomic<int> m_tunerMode{ 0 }; // 0 = chromatic, 1 = guitar, 2 = bass
     std::atomic<int> m_language{ 0 }; // 0=EN, 1=DE, 2=HU
+    std::atomic<bool> m_sharpPresent{ true }; // For sharp/flat display
 
 private:
     //==============================================================================
@@ -77,4 +78,9 @@ private:
     int m_ringWritePos = 0; // Indexing
     double m_sampleRate = 44100.0; // Set the sample rate temporarily. It will be set properly by DAW.
     bool m_bufferFull = false;
+
+    int m_silenceCounter = 0;
+    const int SILENCE_HOLD_FRAMES = 30;
+    
+    double m_smoothedHz = -1.0;
 };

@@ -46,18 +46,37 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
     m_languageBox.addItem("Deutsch", 2);
     m_languageBox.addItem("Magyar", 3);
 
+	m_sharpFlatBox.addItem(juce::String::fromUTF8(SHARP_SYMBOL), 1);
+	m_sharpFlatBox.addItem(juce::String::fromUTF8(FLAT_SYMBOL), 2);
+
     m_languageBox.setSelectedId(1, juce::dontSendNotification);
+	m_sharpFlatBox.setSelectedId(1, juce::dontSendNotification);
 
     // Capture m_languageBox by reference in the lambda
     m_languageBox.onChange = [this] {
+       
         audioProcessor.m_language.store(m_languageBox.getSelectedId() - 1);
+        auto lang = LANGUAGES[audioProcessor.m_language.load()];
+        
         m_chromButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].chromatic));
         m_guitarButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].guitar));
 		m_bassButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].bass));
     };
 
-	addAndMakeVisible(m_languageBox);
+    m_sharpFlatBox.onChange = [this] {
+        if (m_sharpFlatBox.getSelectedId() == 1) {
+            audioProcessor.m_sharpPresent.store(true);
+        }
+        else {
+            audioProcessor.m_sharpPresent.store(false);
+        }
+    };
 
+	addAndMakeVisible(m_languageBox);
+	addAndMakeVisible(m_sharpFlatBox);
+
+	// Restore saved settings
+    m_languageBox.setSelectedId(audioProcessor.m_language.load() + 1, juce::dontSendNotification);
 }
 
 TunerPluginAudioProcessorEditor::~TunerPluginAudioProcessorEditor()
@@ -79,7 +98,12 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
     {
         double midi = 69.0 + 12.0 * std::log2(currentHz / tuningReference);
         int nearestNote = static_cast<int>(std::round(midi));
-        std::string noteName = noteNamesSharp[nearestNote % 12];
+
+		std::string noteName;
+
+        if (audioProcessor.m_sharpPresent) noteName = noteNamesSharp[nearestNote % 12];
+		else noteName = noteNamesFlat[nearestNote % 12];
+
         int octave = (nearestNote / 12) - 1;
         displayNote = juce::String(noteName) + juce::String(octave);
         float targetHz = 440.0f * std::pow(2.0f, (nearestNote - 69) / 12.0f);
@@ -106,6 +130,12 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
     g.setFont(24.0f);
     g.setColour(juce::Colours::white);
     g.drawText(displayNote, noteDisplayBounds, juce::Justification::centred, true);
+
+    g.setFont(9.0f);
+    g.setColour(juce::Colour(0xFF444444));
+    g.drawText("ZSOMBII Audio x ZSOMBII Microsystems",
+        0, getHeight() - 15, getWidth() - 5, 12,
+        juce::Justification::centredRight, true);
 }
 
 void TunerPluginAudioProcessorEditor::resized()
@@ -114,4 +144,5 @@ void TunerPluginAudioProcessorEditor::resized()
     m_guitarButton.setBounds(30, 195, 110, 30);
     m_bassButton.setBounds(30, 230, 110, 30);
     m_languageBox.setBounds(280, 10, 110, 25);
+    m_sharpFlatBox.setBounds(10, 10, 110, 25);
 }

@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "config.h"
 
 //==============================================================================
 TunerPluginAudioProcessor::TunerPluginAudioProcessor()
@@ -165,6 +166,27 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     if (m_bufferFull) {
 
+        // RMS noise gate
+
+        float sum = 0.0f;
+        for (int i = 0; i < YIN_BUFFER_SIZE; ++i) {
+            sum += (float)(m_ringBuffer[i] * m_ringBuffer[i]);
+        }
+        float rms = std::sqrt(sum / YIN_BUFFER_SIZE);
+
+        if (rms < RMS_THRESHOLD) // RMS threshold
+        {
+            
+            m_silenceCounter++;
+            if (m_silenceCounter > SILENCE_HOLD_FRAMES)
+                m_detectedHz.store(-1.0, std::memory_order_relaxed);
+			m_bufferFull = false;
+            return;
+        }
+        else {
+			m_silenceCounter = 0; // Reset silence counter if signal is above threshold
+        }
+
 		double frequency = dywapitch_computepitch(&m_pitchTracker, m_ringBuffer.data(), 0, YIN_BUFFER_SIZE);
 
         int mode = m_tunerMode.load(std::memory_order_relaxed);
@@ -173,25 +195,32 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
         switch (mode) {
             case 1: // Guitar thresholds
-                minHz = 60.0f;
-                maxHz = 1400.0f;
+                minHz = GUITAR_FREQ_MIN;
+                maxHz = GUITAR_FREQ_MAX;
                 break;
             case 2: // Bass thresholds
-                minHz = 25.0f;
-                maxHz = 400.0f;
+                minHz = BASS_FREQ_MIN;
+                maxHz = BASS_FREQ_MAX;
                 break;
             default: // Chromatic thresholds
-                minHz = 20.0;
-                maxHz = 4200.0f;
+                minHz = CHROM_FREQ_MIN;
+                maxHz = CHROM_FREQ_MAX;
         }
-            
-
 
         if (frequency >= minHz && frequency <= maxHz) {
-            m_detectedHz.store(frequency, std::memory_order_relaxed);
+            
+            if (m_smoothedHz < 0.0f) {
+                m_smoothedHz = frequency;
+            }
+            else {
+                m_smoothedHz = 0.7 * m_smoothedHz + 0.3 * frequency;
+            }
+           
+            m_detectedHz.store(m_smoothedHz, std::memory_order_relaxed);
         }
         else {
             m_detectedHz.store(-1.0f, std::memory_order_relaxed);
+			m_smoothedHz = -1.0f; // Reset smoothed frequency when out of range
 		}
 
 		m_bufferFull = false;
@@ -214,18 +243,23 @@ juce::AudioProcessorEditor* TunerPluginAudioProcessor::createEditor()
 }
 
 //==============================================================================
-void TunerPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+
+void TunerPluginAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    juce::MemoryOutputStream stream(destData, true);
+    stream.writeInt(m_language.load());
+    stream.writeInt(m_tunerMode.load());
+    stream.writeBool(m_sharpPresent.load());
 }
 
-void TunerPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void TunerPluginAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    juce::MemoryInputStream stream(data, sizeInBytes, false);
+    m_language.store(stream.readInt());
+    m_tunerMode.store(stream.readInt());
+    m_sharpPresent.store(stream.readBool());
 }
+
 
 //==============================================================================
 // This creates new instances of the plugin..
