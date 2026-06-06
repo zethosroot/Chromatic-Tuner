@@ -52,19 +52,29 @@ void TunerPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     auto currentHz = audioProcessor.m_detectedHz.load(std::memory_order_relaxed);
 
+	
+
+
     juce::String displayNote;
 
     if (currentHz > 0.0f) {
-        displayNote = juce::String (currentHz, 1) + " Hz";
+
+        double midi = 69.0 + 12.0 * std::log2(currentHz / tuningReference); // Calculate MIDI note number from frequency
+
+        int nearestNote = static_cast<int>(std::round(midi)); // Round to the nearest MIDI note number
+
+        std::string noteName = noteNames[nearestNote % 12]; // Get the note name from the array
+
+        int octave = (nearestNote / 12) - 1; // Calculate the octave number
+
+        displayNote = juce::String(noteName) + juce::String(octave);
     }
     else {
         displayNote = "Idle";
     }
 
 	auto noteDisplayBounds = getLocalBounds(); 
-
     noteDisplayBounds.translate(0, -70);
-
     g.drawText(displayNote, noteDisplayBounds, juce::Justification::centred, true);
 
     
