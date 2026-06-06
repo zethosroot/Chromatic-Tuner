@@ -72,7 +72,7 @@ void TunerPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void TunerPluginAudioProcessorEditor::resized()
 {
-    m_chromButton.setBounds(100, 180, 80, 30);
-    m_guitarButton.setBounds(190, 180, 80, 30);
-    m_bassButton.setBounds(280, 180, 80, 30);
+    m_chromButton.setBounds(30, 160, 80, 30);
+    m_guitarButton.setBounds(30, 195, 80, 30);
+    m_bassButton.setBounds(30, 230, 80, 30);
 }
