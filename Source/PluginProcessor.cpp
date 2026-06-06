@@ -19,7 +19,8 @@ TunerPluginAudioProcessor::TunerPluginAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+	m_pitchTracker{} // Initialize the pitch tracker struct
 #endif
 {
 }
@@ -166,7 +167,27 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
 		double frequency = dywapitch_computepitch(&m_pitchTracker, m_ringBuffer.data(), 0, YIN_BUFFER_SIZE);
 
-        if (frequency >= 50 && frequency <= 1400) {
+        int mode = m_tunerMode.load(std::memory_order_relaxed);
+
+        float minHz, maxHz;
+
+        switch (mode) {
+            case 1: // Guitar thresholds
+                minHz = 60.0f;
+                maxHz = 1400.0f;
+                break;
+            case 2: // Bass thresholds
+                minHz = 25.0f;
+                maxHz = 400.0f;
+                break;
+            default: // Chromatic thresholds
+                minHz = 20.0;
+                maxHz = 4200.0f;
+        }
+            
+
+
+        if (frequency >= minHz && frequency <= maxHz) {
             m_detectedHz.store(frequency, std::memory_order_relaxed);
         }
         else {
