@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "config.h"
 
 void TunerPluginAudioProcessorEditor::timerCallback() {
     repaint();
@@ -22,6 +23,17 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
     setSize (400, 300);
 
     startTimerHz(30);
+
+	addAndMakeVisible(m_chromButton);
+	addAndMakeVisible(m_guitarButton);
+	addAndMakeVisible(m_bassButton);
+
+	m_guitarButton.setRadioGroupId(TUNER_TYPE_GROUP);
+	m_bassButton.setRadioGroupId(TUNER_TYPE_GROUP);
+	m_chromButton.setRadioGroupId(TUNER_TYPE_GROUP);
+
+	m_guitarButton.setToggleState(true, juce::dontSendNotification);
+
 }
 
 TunerPluginAudioProcessorEditor::~TunerPluginAudioProcessorEditor()
@@ -40,20 +52,27 @@ void TunerPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     auto currentHz = audioProcessor.m_detectedHz.load(std::memory_order_relaxed);
 
-    juce::String displayString;
+    juce::String displayNote;
 
     if (currentHz > 0.0f) {
-        displayString = juce::String (currentHz, 1) + " Hz";
+        displayNote = juce::String (currentHz, 1) + " Hz";
     }
     else {
-        displayString = "Idle";
+        displayNote = "Idle";
     }
 
-    g.drawText(displayString, getLocalBounds(), juce::Justification::centred, true);
+	auto noteDisplayBounds = getLocalBounds(); 
+
+    noteDisplayBounds.translate(0, -70);
+
+    g.drawText(displayNote, noteDisplayBounds, juce::Justification::centred, true);
+
+    
 }
 
 void TunerPluginAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    m_chromButton.setBounds(100, 180, 80, 30);
+    m_guitarButton.setBounds(190, 180, 80, 30);
+    m_bassButton.setBounds(280, 180, 80, 30);
 }

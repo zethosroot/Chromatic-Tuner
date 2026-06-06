@@ -30,5 +30,9 @@ private:
     // access the processor object that created it.
     TunerPluginAudioProcessor& audioProcessor;
 
+	juce::ToggleButton m_chromButton{ "Chromatic" };
+    juce::ToggleButton m_guitarButton{ "Guitar" };
+    juce::ToggleButton m_bassButton{ "Bass" };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TunerPluginAudioProcessorEditor)
 };
