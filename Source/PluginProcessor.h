@@ -64,6 +64,8 @@ public:
     std::atomic<double> m_detectedCents{0.0f};
     std::atomic<int> m_detectedNote{-1};
 
+    std::atomic<float> m_detectedRms{ 0.0f };
+
     std::atomic<int> m_tunerMode{ 0 }; // 0 = chromatic, 1 = guitar, 2 = bass
     std::atomic<int> m_language{ 0 }; // 0=EN, 1=DE, 2=HU
     std::atomic<bool> m_sharpPresent{ true }; // For sharp/flat display

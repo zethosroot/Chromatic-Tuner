@@ -174,6 +174,8 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         }
         float rms = std::sqrt(sum / YIN_BUFFER_SIZE);
 
+        m_detectedRms.store(rms, std::memory_order_relaxed);
+
         if (rms < RMS_THRESHOLD) // RMS threshold
         {
             

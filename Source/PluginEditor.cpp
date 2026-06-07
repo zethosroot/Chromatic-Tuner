@@ -109,20 +109,24 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
         float targetHz = 440.0f * std::pow(2.0f, (nearestNote - 69) / 12.0f);
         int cents = static_cast<int>(std::round(1200.0f * std::log2(currentHz / targetHz)));
 
+		float volumeDb = 20.0f * std::log10(audioProcessor.m_detectedRms.load(std::memory_order_relaxed) + 1e-6f); // Avoid log(0)
+
         g.setFont(14.0f);
         g.setColour(juce::Colour(0xFFAAAAAA));
         g.drawText(juce::String::fromUTF8(lang.frequency) + ": " + juce::String(currentHz, 1) + " Hz",
             240, 160, 140, 25, juce::Justification::centredLeft, true);
         g.drawText(juce::String::fromUTF8(lang.deviation) + ": " + juce::String(cents) + " " + juce::String::fromUTF8(lang.cents),
             240, 190, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.volume) + ": " + juce::String::formatted("%.2f", volumeDb) + " dB", 240, 220, 140, 25, juce::Justification::centredLeft, true);
     }
     else
     {
         displayNote = "--";
         g.setFont(14.0f);
         g.setColour(juce::Colour(0xFFAAAAAA));
-        g.drawText(juce::String::fromUTF8(lang.frequency) + " -- Hz", 240, 160, 140, 25, juce::Justification::centredLeft, true);
-        g.drawText(juce::String::fromUTF8(lang.deviation) + " -- " + juce::String::fromUTF8(lang.cents), 240, 190, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.frequency) + ": -- Hz", 240, 160, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.deviation) + ": -- " + juce::String::fromUTF8(lang.cents), 240, 190, 140, 25, juce::Justification::centredLeft, true);
+		g.drawText(juce::String::fromUTF8(lang.volume) + ": -- dB", 240, 220, 140, 25, juce::Justification::centredLeft, true);
     }
 
     auto noteDisplayBounds = getLocalBounds();
