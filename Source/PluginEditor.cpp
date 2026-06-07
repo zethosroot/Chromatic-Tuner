@@ -64,7 +64,14 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
 	m_sharpFlatBox.addItem(juce::String::fromUTF8(FLAT_SYMBOL), 2);
 
     m_languageBox.setSelectedId(1, juce::dontSendNotification);
-	m_sharpFlatBox.setSelectedId(1, juce::dontSendNotification);
+	m_sharpFlatBox.setSelectedId(1, juce::dontSendNotification); 
+
+    m_checkForUpdatesButton.setColour(juce::TextButton::buttonOnColourId,
+        juce::Colour(0xFF1A1A1A));
+    m_checkForUpdatesButton.setColour(juce::ComboBox::outlineColourId,
+        juce::Colour(0xFF1A1A1A));  // hide outline
+    m_checkForUpdatesButton.setColour(juce::TextButton::textColourOffId,
+        juce::Colours::white);  // dim grey text
 
     // Capture m_languageBox by reference in the lambda
     m_languageBox.onChange = [this] {
@@ -75,6 +82,9 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
         m_chromButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].chromatic));
         m_guitarButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].guitar));
 		m_bassButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].bass));
+        
+        m_checkForUpdatesButton.setButtonText(juce::String::fromUTF8(lang.checkForUpdates));
+        m_checkForUpdatesButton.changeWidthToFitText();  // auto-fits width to text
     };
 
     m_sharpFlatBox.onChange = [this] {
@@ -88,9 +98,10 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
 
 	addAndMakeVisible(m_languageBox);
 	addAndMakeVisible(m_sharpFlatBox);
+	addAndMakeVisible(m_checkForUpdatesButton);
 
 	// Restore saved settings
-    m_languageBox.setSelectedId(audioProcessor.m_language.load() + 1, juce::dontSendNotification);
+    m_languageBox.setSelectedId(audioProcessor.m_language.load() + 1, juce::sendNotification);
 }
 
 TunerPluginAudioProcessorEditor::~TunerPluginAudioProcessorEditor()
@@ -143,7 +154,6 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
         g.drawText(juce::String::fromUTF8(lang.frequency) + ": -- Hz", 240, 160, 140, 25, juce::Justification::centredLeft, true);
         g.drawText(juce::String::fromUTF8(lang.deviation) + ": -- " + juce::String::fromUTF8(lang.cents), 240, 190, 140, 25, juce::Justification::centredLeft, true);
 		g.drawText(juce::String::fromUTF8(lang.volume) + ": -- dB", 240, 220, 140, 25, juce::Justification::centredLeft, true);
-		g.setColour(juce::Colour(0xFFFFFFFF));
     }
 
     auto noteDisplayBounds = getLocalBounds();
@@ -152,25 +162,25 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
 
 	int absoluteCents = std::abs(cents); // Absolute value for easier comparison
 
-    if (absoluteCents <= 5) {
-        g.setColour(juce::Colour(0xFF00FF00)); // Green for in-tune
+    if (absoluteCents <= IN_TUNE_CENTS) {
+        g.setColour(juce::Colours::green); // Green for in-tune
     }
     else if (absoluteCents <= SLIGHT_OFF_CENTS) {
-        g.setColour(juce::Colour(0xFFFFFF00)); // Yellow for slightly out of tune
+        g.setColour(juce::Colours::yellow); // Yellow for slightly out of tune
     }
     else {
-        g.setColour(juce::Colour(0xFFFF0000)); // Red for out of tune
+        g.setColour(juce::Colours::red); // Red for out of tune
 	}
 
     g.drawText(displayNote, noteDisplayBounds, juce::Justification::centred, true);
 
-    g.setFont(9.0f);
+    g.setFont(12.0f);
     g.setColour(juce::Colour(0xFF444444));
-    g.drawText("ZSOMBII Audio x ZSOMBII Microsystems",
+    g.drawText("Version: " + juce::String(PLUGIN_VERSION),
         0, getHeight() - 15, getWidth() - 5, 12,
         juce::Justification::centredRight, true);
 
-    int barY = 100;      
+    int barY = 110;      
     int barHeight = 20;
     int startX = 130; 
     int endX = 270;
@@ -200,12 +210,21 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
     int needleX = startX + (int)(fraction * width);
 
     juce::Colour needleColour;
-    if (std::abs(m_smoothedCents) < 5.0f)       needleColour = juce::Colours::green;
-    else if (std::abs(m_smoothedCents) < 15.0f) needleColour = juce::Colours::yellow;
+    if (std::abs(m_smoothedCents) <= IN_TUNE_CENTS)       needleColour = juce::Colours::green;
+    else if (std::abs(m_smoothedCents) <= SLIGHT_OFF_CENTS) needleColour = juce::Colours::yellow;
     else needleColour = juce::Colours::red;
 
     g.setColour(needleColour);
 	g.drawLine(needleX, barY, needleX, barY + barHeight - 2, 2.0f);
+
+    // Branding
+    g.setFont(28.0f);
+    g.setColour(juce::Colours::white);
+    g.drawText(PLUGIN_NAME, 0, 8, getWidth(), 28, juce::Justification::centred, true);
+
+    g.setFont(12.0f);
+    g.setColour(juce::Colour(0xFF666666));
+    g.drawText("By " + juce::String(PLUGIN_VENDOR), 0, 36, getWidth(), 12, juce::Justification::centred, true);
 
 }
 
@@ -216,4 +235,5 @@ void TunerPluginAudioProcessorEditor::resized()
     m_bassButton.setBounds(30, 230, 110, 30);
     m_languageBox.setBounds(280, 10, 110, 25);
     m_sharpFlatBox.setBounds(10, 10, 110, 25);
+	m_checkForUpdatesButton.setBounds(10, 275, 90, 20);
 }

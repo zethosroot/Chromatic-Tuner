@@ -4,7 +4,7 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyWebsite="audio.zsombii.com"
               companyName="ZSOMBII Audio" pluginName="ZentNote" pluginDesc="Your free guitar and bass tuner plugin for DAWs. part of the ZSOMBII Audio &amp; ZSOMBII Microsystems projects."
               pluginManufacturer="ZSOMBII Audio" pluginVST3Category="Tools"
-              version="1.0.0" bundleIdentifier="com.zsombiiaudio.zentnote"
+              version="0.1.0" bundleIdentifier="com.zsombiiaudio.zentnote"
               aaxIdentifier="com.zsombiiaudio.zentnote" pluginVSTCategory="kPlugCategUnknown">
   <MAINGROUP id="I3jS92" name="ZentNote">
     <GROUP id="{58CDF60D-2269-05EF-9F24-1336F1703FC4}" name="Source">

@@ -34,8 +34,10 @@ private:
     juce::ToggleButton m_guitarButton{ "Guitar" };
     juce::ToggleButton m_bassButton{ "Bass" };
     juce::ComboBox m_languageBox;
-	juce::ComboBox m_sharpFlatBox;
+    juce::ComboBox m_sharpFlatBox;
+    juce::TextButton m_checkForUpdatesButton{ "Check for updates" };
     float m_smoothedCents = 0.0f;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TunerPluginAudioProcessorEditor)
 };
