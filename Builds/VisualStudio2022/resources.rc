@@ -16,9 +16,10 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "FileDescription",  "TunerPlugin\0"
+      VALUE "CompanyName",  "ZSOMBII Audio\0"
+      VALUE "FileDescription",  "ZentNote\0"
       VALUE "FileVersion",  "1.0.0\0"
-      VALUE "ProductName",  "TunerPlugin\0"
+      VALUE "ProductName",  "ZentNote\0"
       VALUE "ProductVersion",  "1.0.0\0"
     END
   END

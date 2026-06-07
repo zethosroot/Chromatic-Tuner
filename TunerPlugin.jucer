@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="kSSnkh" name="ZSOMBII Chromatic Tuner" projectType="audioplug"
-              useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
-              companyWebsite="audio.zsombii.com" companyName="ZSOMBII Audio"
-              pluginName="ZSOMBII Chromatic Tuner" pluginDesc="Your free guitar and bass tuner plugin for DAWs. part of the ZSOMBII Audio &amp; ZSOMBII Microsystems projects."
+<JUCERPROJECT id="kSSnkh" name="ZentNote" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyWebsite="audio.zsombii.com"
+              companyName="ZSOMBII Audio" pluginName="ZentNote" pluginDesc="Your free guitar and bass tuner plugin for DAWs. part of the ZSOMBII Audio &amp; ZSOMBII Microsystems projects."
               pluginManufacturer="ZSOMBII Audio" pluginVST3Category="Tools"
-              version="1.0.0">
-  <MAINGROUP id="I3jS92" name="ZSOMBII Chromatic Tuner">
+              version="1.0.0" bundleIdentifier="com.zsombiiaudio.zentnote"
+              aaxIdentifier="com.zsombiiaudio.zentnote" pluginVSTCategory="kPlugCategUnknown">
+  <MAINGROUP id="I3jS92" name="ZentNote">
     <GROUP id="{58CDF60D-2269-05EF-9F24-1336F1703FC4}" name="Source">
       <FILE id="cNfY0Y" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -39,8 +39,8 @@
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="ZSOMBII_Chromatic_Tuner"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="ZSOMBII_Chromatic_Tuner"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="ZentNote"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="ZentNote"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_animation" path="../../../../../../../Program Files/JUCE/modules"/>
