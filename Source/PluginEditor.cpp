@@ -10,15 +10,21 @@
 #include "PluginEditor.h"
 #include "config.h"
 
-void TunerPluginAudioProcessorEditor::timerCallback() {
-    
-	float targetCents = (float)audioProcessor.m_detectedCents.load(std::memory_order_relaxed);
+void TunerPluginAudioProcessorEditor::timerCallback()
+{
+    float currentHz = audioProcessor.m_detectedHz.load(std::memory_order_relaxed);
 
-    if (audioProcessor.m_detectedHz.load() > 0.0f)
-		m_smoothedCents = 0.8f * m_smoothedCents + 0.2f * targetCents;
+    if (currentHz > 0.0f)
+    {
+        double midi = 69.0 + 12.0 * std::log2(currentHz / tuningReference);
+        int nearestNote = static_cast<int>(std::round(midi));
+        float targetHz = 440.0f * std::pow(2.0f, (nearestNote - 69) / 12.0f);
+        float targetCents = 1200.0f * std::log2f(currentHz / targetHz);
+        m_smoothedCents = 0.8f * m_smoothedCents + 0.2f * targetCents;
+    }
     else
-		m_smoothedCents = 0.0f; // Reset to zero when no pitch is detected
-    
+        m_smoothedCents = 0.8f * m_smoothedCents + 0.2f * 0.0f;
+
     repaint();
 }
 
