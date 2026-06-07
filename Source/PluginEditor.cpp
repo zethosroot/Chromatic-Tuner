@@ -11,6 +11,14 @@
 #include "config.h"
 
 void TunerPluginAudioProcessorEditor::timerCallback() {
+    
+	float targetCents = (float)audioProcessor.m_detectedCents.load(std::memory_order_relaxed);
+
+    if (audioProcessor.m_detectedHz.load() > 0.0f)
+		m_smoothedCents = 0.8f * m_smoothedCents + 0.2f * targetCents;
+    else
+		m_smoothedCents = 0.0f; // Reset to zero when no pitch is detected
+    
     repaint();
 }
 
@@ -136,6 +144,44 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
     g.drawText("ZSOMBII Audio x ZSOMBII Microsystems",
         0, getHeight() - 15, getWidth() - 5, 12,
         juce::Justification::centredRight, true);
+
+    int barY = 100;      
+    int barHeight = 20;
+    int startX = 130; 
+    int endX = 270;
+    int width = endX - startX;
+
+    for (int i = 0; i <= 4; i++) {
+        int tickX = startX + (i * width / 4);
+        int tickHeight = (i == 2) ? 12 : 7;
+        g.setColour(juce::Colour(0xFF666666));
+        g.drawLine(tickX, barY + barHeight - tickHeight, tickX, barY + barHeight, 1.5f);
+    }
+
+    // Cent labels
+
+    g.setFont(9.0f);
+    g.setColour(juce::Colour(0xFF666666));
+    int labels[] = { -50, -25, 0, 25, 50 };
+    for (int i = 0; i <= 4; i++)
+    {
+        int tickX = startX + (i * width / 4);
+        juce::String label = (labels[i] > 0 ? "+" : "") + juce::String(labels[i]);
+        g.drawText(label, tickX - 12, barY + barHeight + 2, 24, 12,
+            juce::Justification::centred, true);
+    }
+
+    float fraction = juce::jlimit(0.0f, 1.0f, (m_smoothedCents + 50.0f) / 100.0f);
+    int needleX = startX + (int)(fraction * width);
+
+    juce::Colour needleColour;
+    if (std::abs(m_smoothedCents) < 5.0f)       needleColour = juce::Colours::green;
+    else if (std::abs(m_smoothedCents) < 15.0f) needleColour = juce::Colours::yellow;
+    else needleColour = juce::Colours::red;
+
+    g.setColour(needleColour);
+	g.drawLine(needleX, barY, needleX, barY + barHeight - 2, 2.0f);
+
 }
 
 void TunerPluginAudioProcessorEditor::resized()
