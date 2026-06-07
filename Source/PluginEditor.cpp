@@ -94,6 +94,8 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
     auto currentHz = audioProcessor.m_detectedHz.load(std::memory_order_relaxed);
     juce::String displayNote;
 
+	int cents = 0; // Declaration early for later use.
+
     if (currentHz > 0.0f)
     {
         double midi = 69.0 + 12.0 * std::log2(currentHz / tuningReference);
@@ -107,7 +109,7 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
         int octave = (nearestNote / 12) - 1;
         displayNote = juce::String(noteName) + juce::String(octave);
         float targetHz = 440.0f * std::pow(2.0f, (nearestNote - 69) / 12.0f);
-        int cents = static_cast<int>(std::round(1200.0f * std::log2(currentHz / targetHz)));
+        cents = static_cast<int>(std::round(1200.0f * std::log2(currentHz / targetHz)));
 
 		float volumeDb = 20.0f * std::log10(audioProcessor.m_detectedRms.load(std::memory_order_relaxed) + 1e-6f); // Avoid log(0)
 
@@ -127,12 +129,25 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
         g.drawText(juce::String::fromUTF8(lang.frequency) + ": -- Hz", 240, 160, 140, 25, juce::Justification::centredLeft, true);
         g.drawText(juce::String::fromUTF8(lang.deviation) + ": -- " + juce::String::fromUTF8(lang.cents), 240, 190, 140, 25, juce::Justification::centredLeft, true);
 		g.drawText(juce::String::fromUTF8(lang.volume) + ": -- dB", 240, 220, 140, 25, juce::Justification::centredLeft, true);
+		g.setColour(juce::Colour(0xFFFFFFFF));
     }
 
     auto noteDisplayBounds = getLocalBounds();
     noteDisplayBounds.translate(0, -70);
     g.setFont(24.0f);
-    g.setColour(juce::Colours::white);
+
+	int absoluteCents = std::abs(cents); // Absolute value for easier comparison
+
+    if (absoluteCents <= 5) {
+        g.setColour(juce::Colour(0xFF00FF00)); // Green for in-tune
+    }
+    else if (absoluteCents <= SLIGHT_OFF_CENTS) {
+        g.setColour(juce::Colour(0xFFFFFF00)); // Yellow for slightly out of tune
+    }
+    else {
+        g.setColour(juce::Colour(0xFFFF0000)); // Red for out of tune
+	}
+
     g.drawText(displayNote, noteDisplayBounds, juce::Justification::centred, true);
 
     g.setFont(9.0f);

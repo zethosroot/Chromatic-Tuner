@@ -9,6 +9,7 @@ constexpr float BASS_FREQ_MIN = 25.0f;
 constexpr float BASS_FREQ_MAX = 400.0f;
 constexpr float CHROM_FREQ_MIN = 20.0f;
 constexpr float CHROM_FREQ_MAX = 4200.0f;
+constexpr int SLIGHT_OFF_CENTS = 25;
 
 extern const char* noteNamesSharp[12];
 extern const char* noteNamesFlat[12];
