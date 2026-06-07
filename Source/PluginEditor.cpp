@@ -102,6 +102,16 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
 
 	// Restore saved settings
     m_languageBox.setSelectedId(audioProcessor.m_language.load() + 1, juce::sendNotification);
+
+    // Restore mode buttons
+    int savedMode = audioProcessor.m_tunerMode.load();
+    m_chromButton.setToggleState(savedMode == 0, juce::dontSendNotification);
+    m_guitarButton.setToggleState(savedMode == 1, juce::dontSendNotification);
+    m_bassButton.setToggleState(savedMode == 2, juce::dontSendNotification);
+
+    // Restore sharp/flat box
+    m_sharpFlatBox.setSelectedId(audioProcessor.m_sharpPresent.load() ? 1 : 2,
+        juce::dontSendNotification);
 }
 
 TunerPluginAudioProcessorEditor::~TunerPluginAudioProcessorEditor()

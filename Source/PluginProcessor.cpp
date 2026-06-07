@@ -176,6 +176,15 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
         m_detectedRms.store(rms, std::memory_order_relaxed);
 
+		float rmsThreshold = RMS_THRESHOLD; // Default RMS threshold value
+
+        if (m_smoothedHz > 0.0f) {
+            if (m_smoothedHz > 200) rmsThreshold = 0.002f; // Higher threshold for higher frequencies
+			else if (m_smoothedHz > 100) rmsThreshold = 0.005f; // Medium threshold for mid frequencies
+			else rmsThreshold = 0.01f; // Lower threshold for lower frequencies
+        }
+
+
         if (rms < RMS_THRESHOLD) // RMS threshold
         {
             
