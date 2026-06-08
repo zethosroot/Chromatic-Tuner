@@ -63,28 +63,17 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
 	m_sharpFlatBox.addItem(juce::String::fromUTF8(SHARP_SYMBOL), 1);
 	m_sharpFlatBox.addItem(juce::String::fromUTF8(FLAT_SYMBOL), 2);
 
-    m_languageBox.setSelectedId(1, juce::dontSendNotification);
-	m_sharpFlatBox.setSelectedId(1, juce::dontSendNotification); 
-
-    m_checkForUpdatesButton.setColour(juce::TextButton::buttonOnColourId,
-        juce::Colour(0xFF1A1A1A));
-    m_checkForUpdatesButton.setColour(juce::ComboBox::outlineColourId,
-        juce::Colour(0xFF1A1A1A));  // hide outline
-    m_checkForUpdatesButton.setColour(juce::TextButton::textColourOffId,
-        juce::Colours::white);  // dim grey text
+	m_sharpFlatBox.setSelectedId(1, juce::dontSendNotification);
 
     // Capture m_languageBox by reference in the lambda
     m_languageBox.onChange = [this] {
-       
+
         audioProcessor.m_language.store(m_languageBox.getSelectedId() - 1);
         auto lang = LANGUAGES[audioProcessor.m_language.load()];
-        
-        m_chromButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].chromatic));
-        m_guitarButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].guitar));
-		m_bassButton.setButtonText(juce::String::fromUTF8(LANGUAGES[audioProcessor.m_language.load()].bass));
-        
-        m_checkForUpdatesButton.setButtonText(juce::String::fromUTF8(lang.checkForUpdates));
-        m_checkForUpdatesButton.changeWidthToFitText();  // auto-fits width to text
+
+        m_chromButton.setButtonText(juce::String::fromUTF8(lang.chromatic));
+        m_guitarButton.setButtonText(juce::String::fromUTF8(lang.guitar));
+		m_bassButton.setButtonText(juce::String::fromUTF8(lang.bass));
     };
 
     m_sharpFlatBox.onChange = [this] {
@@ -98,7 +87,6 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
 
 	addAndMakeVisible(m_languageBox);
 	addAndMakeVisible(m_sharpFlatBox);
-	addAndMakeVisible(m_checkForUpdatesButton);
 
 	// Restore saved settings
     m_languageBox.setSelectedId(audioProcessor.m_language.load() + 1, juce::sendNotification);
@@ -151,19 +139,19 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
         g.setFont(14.0f);
         g.setColour(juce::Colour(0xFFAAAAAA));
         g.drawText(juce::String::fromUTF8(lang.frequency) + ": " + juce::String(currentHz, 1) + " Hz",
-            240, 160, 140, 25, juce::Justification::centredLeft, true);
+            270, 160, 140, 25, juce::Justification::centredLeft, true);
         g.drawText(juce::String::fromUTF8(lang.deviation) + ": " + juce::String(cents) + " " + juce::String::fromUTF8(lang.cents),
-            240, 190, 140, 25, juce::Justification::centredLeft, true);
-        g.drawText(juce::String::fromUTF8(lang.volume) + ": " + juce::String::formatted("%.2f", volumeDb) + " dB", 240, 220, 140, 25, juce::Justification::centredLeft, true);
+            270, 190, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.volume) + ": " + juce::String::formatted("%.2f", volumeDb) + " dB", 270, 220, 140, 25, juce::Justification::centredLeft, true);
     }
     else
     {
         displayNote = "--";
         g.setFont(14.0f);
         g.setColour(juce::Colour(0xFFAAAAAA));
-        g.drawText(juce::String::fromUTF8(lang.frequency) + ": -- Hz", 240, 160, 140, 25, juce::Justification::centredLeft, true);
-        g.drawText(juce::String::fromUTF8(lang.deviation) + ": -- " + juce::String::fromUTF8(lang.cents), 240, 190, 140, 25, juce::Justification::centredLeft, true);
-		g.drawText(juce::String::fromUTF8(lang.volume) + ": -- dB", 240, 220, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.frequency) + ": -- Hz", 270, 160, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.deviation) + ": -- " + juce::String::fromUTF8(lang.cents), 270, 190, 140, 25, juce::Justification::centredLeft, true);
+		g.drawText(juce::String::fromUTF8(lang.volume) + ": -- dB", 270, 220, 140, 25, juce::Justification::centredLeft, true);
     }
 
     auto noteDisplayBounds = getLocalBounds();
@@ -184,9 +172,9 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
 
     g.drawText(displayNote, noteDisplayBounds, juce::Justification::centred, true);
 
-    g.setFont(12.0f);
+    g.setFont(1.0f);
     g.setColour(juce::Colour(0xFF444444));
-    g.drawText("Version: " + juce::String(PLUGIN_VERSION),
+    g.drawText(juce::String::fromUTF8(lang.version) + ": " + juce::String(PLUGIN_VERSION),
         0, getHeight() - 15, getWidth() - 5, 12,
         juce::Justification::centredRight, true);
 
@@ -245,5 +233,4 @@ void TunerPluginAudioProcessorEditor::resized()
     m_bassButton.setBounds(30, 230, 110, 30);
     m_languageBox.setBounds(280, 10, 110, 25);
     m_sharpFlatBox.setBounds(10, 10, 110, 25);
-	m_checkForUpdatesButton.setBounds(10, 275, 90, 20);
 }

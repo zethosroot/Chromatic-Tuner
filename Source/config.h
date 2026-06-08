@@ -32,22 +32,22 @@ struct LanguageStrings
     const char* chromatic;
     const char* cents;
     const char* volume;
-	const char* checkForUpdates;
+    const char* version;
 };
 
 constexpr LanguageStrings LANG_EN = {
     "Frequency", "Deviation", "Guitar", "Bass",
-	"Chromatic", "cents", "Volume", "Check for updates",
+    "Chromatic", "cents", "Volume", "Version"
 };
 
 constexpr LanguageStrings LANG_DE = {
     u8"Frequenz", u8"Abweichung", u8"Gitarre", u8"Bass",
-	u8"Chromatisch", u8"cents", u8"Lautstärke", u8"Nach Updates suchen"
+    u8"Chromatisch", u8"cents", u8"Lautstärke", u8"Version"
 };
 
 constexpr LanguageStrings LANG_HU = {
     u8"Frekvencia", u8"Eltérés", u8"Gitár", u8"Basszus",
-	u8"Kromatikus", u8"cent", u8"Hangerő", u8"Frissítések keresése"
+    u8"Kromatikus", u8"cent", u8"Hangerő", u8"Verzió"
 };
 
 constexpr LanguageStrings LANGUAGES[3] = { LANG_EN, LANG_DE, LANG_HU };
