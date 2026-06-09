@@ -11,6 +11,7 @@ constexpr float CHROM_FREQ_MIN = 20.0f;
 constexpr float CHROM_FREQ_MAX = 4200.0f;
 constexpr int SLIGHT_OFF_CENTS = 15;
 constexpr int IN_TUNE_CENTS = 5;
+constexpr int REFERENCE_TONE_MS = 1500;
 
 constexpr char* PLUGIN_NAME = "ZentNote";
 constexpr char* PLUGIN_VERSION = "0.1.0-dev";
@@ -37,17 +38,17 @@ struct LanguageStrings
 
 constexpr LanguageStrings LANG_EN = {
     "Frequency", "Deviation", "Guitar", "Bass",
-    "Chromatic", "cents", "Volume", "Version"
+	"Chromatic", "cents", "Volume", "Version"
 };
 
 constexpr LanguageStrings LANG_DE = {
     u8"Frequenz", u8"Abweichung", u8"Gitarre", u8"Bass",
-    u8"Chromatisch", u8"cents", u8"Lautstärke", u8"Version"
+	u8"Chromatisch", u8"cents", u8"Lautstärke", u8"Version"
 };
 
 constexpr LanguageStrings LANG_HU = {
     u8"Frekvencia", u8"Eltérés", u8"Gitár", u8"Basszus",
-    u8"Kromatikus", u8"cent", u8"Hangerő", u8"Verzió"
+	u8"Kromatikus", u8"cent", u8"Hangerő", u8"Verzió"
 };
 
 constexpr LanguageStrings LANGUAGES[3] = { LANG_EN, LANG_DE, LANG_HU };

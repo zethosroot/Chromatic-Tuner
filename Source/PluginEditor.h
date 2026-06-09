@@ -35,7 +35,7 @@ private:
     juce::ToggleButton m_bassButton{ "Bass" };
     juce::ComboBox m_languageBox;
     juce::ComboBox m_sharpFlatBox;
-    juce::TextButton m_checkForUpdatesButton{ "Check for updates" };
+	juce::TextButton m_tuningReferenceButton;
     float m_smoothedCents = 0.0f;
 
 

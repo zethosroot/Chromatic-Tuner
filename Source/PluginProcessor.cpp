@@ -104,7 +104,6 @@ void TunerPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     m_bufferFull = false; // Buffer is empty
 
     dywapitch_inittracking(&m_pitchTracker);
-
 }
 
 void TunerPluginAudioProcessor::releaseResources()
@@ -167,7 +166,6 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     if (m_bufferFull) {
 
         // RMS noise gate
-
         float sum = 0.0f;
         for (int i = 0; i < YIN_BUFFER_SIZE; ++i) {
             sum += (float)(m_ringBuffer[i] * m_ringBuffer[i]);
@@ -235,11 +233,7 @@ void TunerPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 		}
 
 		m_bufferFull = false;
-
-
     }
-
-    
 }
 
 //==============================================================================

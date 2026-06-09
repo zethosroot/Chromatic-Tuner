@@ -34,23 +34,23 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize(400, 300);
 
     startTimerHz(30);
 
-	addAndMakeVisible(m_chromButton);
-	addAndMakeVisible(m_guitarButton);
-	addAndMakeVisible(m_bassButton);
+    addAndMakeVisible(m_chromButton);
+    addAndMakeVisible(m_guitarButton);
+    addAndMakeVisible(m_bassButton);
 
     m_chromButton.setButtonText(juce::String(LANGUAGES[audioProcessor.m_language.load()].chromatic));
     m_guitarButton.setButtonText(juce::String(LANGUAGES[audioProcessor.m_language.load()].guitar));
     m_bassButton.setButtonText(juce::String(LANGUAGES[audioProcessor.m_language.load()].bass));
 
-	m_guitarButton.setRadioGroupId(TUNER_TYPE_GROUP);
-	m_bassButton.setRadioGroupId(TUNER_TYPE_GROUP);
-	m_chromButton.setRadioGroupId(TUNER_TYPE_GROUP);
+    m_guitarButton.setRadioGroupId(TUNER_TYPE_GROUP);
+    m_bassButton.setRadioGroupId(TUNER_TYPE_GROUP);
+    m_chromButton.setRadioGroupId(TUNER_TYPE_GROUP);
 
-	m_chromButton.setToggleState(true, juce::dontSendNotification);
+    m_chromButton.setToggleState(true, juce::dontSendNotification);
 
     m_chromButton.onClick = [this] { audioProcessor.m_tunerMode.store(0); };
     m_guitarButton.onClick = [this] { audioProcessor.m_tunerMode.store(1); };
@@ -60,10 +60,10 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
     m_languageBox.addItem("Deutsch", 2);
     m_languageBox.addItem("Magyar", 3);
 
-	m_sharpFlatBox.addItem(juce::String::fromUTF8(SHARP_SYMBOL), 1);
-	m_sharpFlatBox.addItem(juce::String::fromUTF8(FLAT_SYMBOL), 2);
+    m_sharpFlatBox.addItem(juce::String::fromUTF8(SHARP_SYMBOL), 1);
+    m_sharpFlatBox.addItem(juce::String::fromUTF8(FLAT_SYMBOL), 2);
 
-	m_sharpFlatBox.setSelectedId(1, juce::dontSendNotification);
+    m_sharpFlatBox.setSelectedId(1, juce::dontSendNotification);
 
     // Capture m_languageBox by reference in the lambda
     m_languageBox.onChange = [this] {
@@ -73,8 +73,8 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
 
         m_chromButton.setButtonText(juce::String::fromUTF8(lang.chromatic));
         m_guitarButton.setButtonText(juce::String::fromUTF8(lang.guitar));
-		m_bassButton.setButtonText(juce::String::fromUTF8(lang.bass));
-    };
+        m_bassButton.setButtonText(juce::String::fromUTF8(lang.bass));
+        };
 
     m_sharpFlatBox.onChange = [this] {
         if (m_sharpFlatBox.getSelectedId() == 1) {
@@ -83,12 +83,12 @@ TunerPluginAudioProcessorEditor::TunerPluginAudioProcessorEditor (TunerPluginAud
         else {
             audioProcessor.m_sharpPresent.store(false);
         }
-    };
+        };
 
-	addAndMakeVisible(m_languageBox);
-	addAndMakeVisible(m_sharpFlatBox);
+    addAndMakeVisible(m_languageBox);
+    addAndMakeVisible(m_sharpFlatBox);
 
-	// Restore saved settings
+    // Restore saved settings
     m_languageBox.setSelectedId(audioProcessor.m_language.load() + 1, juce::sendNotification);
 
     // Restore mode buttons
@@ -139,19 +139,19 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
         g.setFont(14.0f);
         g.setColour(juce::Colour(0xFFAAAAAA));
         g.drawText(juce::String::fromUTF8(lang.frequency) + ": " + juce::String(currentHz, 1) + " Hz",
-            270, 160, 140, 25, juce::Justification::centredLeft, true);
+            220, 160, 140, 25, juce::Justification::centredLeft, true);
         g.drawText(juce::String::fromUTF8(lang.deviation) + ": " + juce::String(cents) + " " + juce::String::fromUTF8(lang.cents),
-            270, 190, 140, 25, juce::Justification::centredLeft, true);
-        g.drawText(juce::String::fromUTF8(lang.volume) + ": " + juce::String::formatted("%.2f", volumeDb) + " dB", 270, 220, 140, 25, juce::Justification::centredLeft, true);
+            220, 190, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.volume) + ": " + juce::String::formatted("%.2f", volumeDb) + " dB", 220, 220, 140, 25, juce::Justification::centredLeft, true);
     }
     else
     {
         displayNote = "--";
         g.setFont(14.0f);
         g.setColour(juce::Colour(0xFFAAAAAA));
-        g.drawText(juce::String::fromUTF8(lang.frequency) + ": -- Hz", 270, 160, 140, 25, juce::Justification::centredLeft, true);
-        g.drawText(juce::String::fromUTF8(lang.deviation) + ": -- " + juce::String::fromUTF8(lang.cents), 270, 190, 140, 25, juce::Justification::centredLeft, true);
-		g.drawText(juce::String::fromUTF8(lang.volume) + ": -- dB", 270, 220, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.frequency) + ": -- Hz", 220, 160, 140, 25, juce::Justification::centredLeft, true);
+        g.drawText(juce::String::fromUTF8(lang.deviation) + ": -- " + juce::String::fromUTF8(lang.cents), 220, 190, 140, 25, juce::Justification::centredLeft, true);
+		g.drawText(juce::String::fromUTF8(lang.volume) + ": -- dB", 220, 220, 140, 25, juce::Justification::centredLeft, true);
     }
 
     auto noteDisplayBounds = getLocalBounds();
@@ -223,14 +223,13 @@ void TunerPluginAudioProcessorEditor::paint(juce::Graphics& g)
     g.setFont(12.0f);
     g.setColour(juce::Colour(0xFF666666));
     g.drawText("By " + juce::String(PLUGIN_VENDOR), 0, 36, getWidth(), 12, juce::Justification::centred, true);
-
 }
 
 void TunerPluginAudioProcessorEditor::resized()
 {
-    m_chromButton.setBounds(30, 160, 110, 30);
-    m_guitarButton.setBounds(30, 195, 110, 30);
-    m_bassButton.setBounds(30, 230, 110, 30);
+    m_chromButton.setBounds(75, 160, 110, 30);
+    m_guitarButton.setBounds(75, 195, 110, 30);
+    m_bassButton.setBounds(75, 230, 110, 30);
     m_languageBox.setBounds(280, 10, 110, 25);
     m_sharpFlatBox.setBounds(10, 10, 110, 25);
 }
